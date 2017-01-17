@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmitHelpers": false,
+    "allowUnreachableCode": false,
+    "baseUrl": "src",
+    "paths": {
+        "app": ["app"]
+    },
+    "outDir": "dist/src/app",
+    "lib": ["dom","es2015"],
+    "typeRoots": ["node_modules/@types/","typings/modules"]
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "e2e",
+    "src/environments",
+    "**/*-aot.ts"
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false
+}

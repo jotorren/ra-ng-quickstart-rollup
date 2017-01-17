@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmitHelpers": false,
+    "allowUnreachableCode": false,
+    "baseUrl": "src",
+    "paths": {
+        "app": ["app"]
+    },
+    "lib": ["dom","es6"],
+    "typeRoots": ["node_modules/@types/","typings/modules"]
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "e2e",
+    "src/environments",
+    "**/*-aot.ts"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": false
+}
