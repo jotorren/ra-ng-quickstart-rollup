@@ -201,7 +201,7 @@ System.set(System.normalizeSync('process'), System.newModule({ env: { ENV: 'deve
 # Building
 When building the bundle for production, we transpile source code to **ES2015**:
 
-```json
+```
 {
   "compilerOptions": {
     "target": "es2015",
@@ -292,14 +292,25 @@ As you can read in the Angular documentation ([see](https://angular.io/docs/ts/l
 
 ## AoT
 
-If you are using `Moment.js` in your application (very likely, some class will contain `import * as moment from 'moment';`) and you run rollup, 
-it will end up with the error `Cannot call a namespace ('moment')`. 
+If you are using `Moment.js` in your application and you run rollup, very likely, it will end up with the 
+error: 
+```diff
+- Cannot call a namespace ('moment')
+```
 
 To solve that problem, you need to use 
 ```ts
 import moment from 'moment'
 ```
-and to avoid the resulting compile error `External module ''moment'' has no default export`
+instead of
+```ts
+import * as moment from 'moment';
+```
+
+And to avoid the resulting compile error:
+```diff
+- External module ''moment'' has no default export
+```
 try changing the `node_modules/moment/moment-node.d.ts` from 
 ```ts
 export = moment;
