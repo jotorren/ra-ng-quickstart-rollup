@@ -228,9 +228,11 @@ This process results in a highly optimized bundle.
 There's a default gulp task that coordinates all required steps: it does not generate source maps, **inlines** all external 
 template/style files used by any angular component and includes minification.
 
+Depending on the build parameters (**prod**, **aot**) `rollup` will generate:
 ```
 dist/
- ├──src/                        * folder containing all compiled javascript files
+ ├──src/                        * folder containing all compiled javascript and AoT (ngfactory, ngsummary) files
+ ├──node_modules/               * folder containing AoT json files (ngsummary) for external libraries
  └──public/
      ├──environments/           * runtime configuration json files
      ├──app/                    * i18n and static configuration json files
