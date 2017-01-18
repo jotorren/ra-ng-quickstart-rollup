@@ -39,6 +39,15 @@ export default {
         }),
         (ENV === 'production' && uglify())
     ],
+    onwarn: function (warn) {
+        if (/THIS_IS_UNDEFINED/.test(warn.code)) return;
+
+        console.error('-----------');
+        console.error(warn.message);
+        if (!/MISSING_EXPORT/.test(warn.code) && warn.loc){
+            console.error(warn.loc);
+        }
+    },
     external: [ 'process' ],
     globals: {
         'process' : 'process'
