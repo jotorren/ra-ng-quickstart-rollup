@@ -13,7 +13,6 @@ var rollup = require('rollup-stream');
 var source = require('vinyl-source-stream');
 
 var tsProject = ts.createProject('tsconfig.prod.json');
-var aotProject = ngc('tsconfig-aot.json');
 
 gulp.task('default', function(callback) {
   runSequence('clean:dist', 'compile:ts', 'gen:assets', 'bundle:rollup', callback);
