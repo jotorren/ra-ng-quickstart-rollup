@@ -31,9 +31,10 @@ achieved by means of [gulp-rev](https://github.com/sindresorhus/gulp-rev).
 
 ## Limitations
 
-* With [Rollup](http://rollupjs.org/) a module cannot be lazy loaded: **Angular 2 lazy routing is not supported**. Anyway, 
-if you have one static js file for the whole application then it means you don't need lazy loading, because it only makes 
-sense when you have several bundles (js files) for your app as per module.
+* With [Rollup](http://rollupjs.org/) and **AoT** compilation, a module cannot be lazy loaded: 
+**Angular 2 lazy routing is not supported** (whilst it is possible if we use the **JiT** compiler). Anyway, if 
+you have one static js file for the whole application then it means you don't need lazy loading, because it only 
+makes sense when you have several bundles (js files) for your app as per module.
 
 ### Quick start
 ```bash
