@@ -4,27 +4,50 @@ var concat = require('gulp-concat');
 var htmlMinifier = require('html-minifier');
 var inlineNg2Template = require('gulp-inline-ng2-template');
 var merge = require('merge2');
-var ngc = require('gulp-ngc');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
+var rev = require("gulp-rev");
+var revReplace = require("gulp-rev-replace");
+var revdel = require('gulp-rev-delete-original');
 var runSequence = require('run-sequence');
+// var sourcemaps = require('gulp-sourcemaps');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
-var rollup = require('rollup-stream');
-var source = require('vinyl-source-stream');
+var gzip = require('gulp-gzip');
+
+var ngc = require('gulp-ngc');
+var Q = require('q');
+var rollup = require( 'rollup' );
 
 var tsProject = ts.createProject('tsconfig.prod.json');
 
 gulp.task('default', function(callback) {
-  runSequence('clean:dist', 'compile:ts', 'gen:assets', 'bundle:rollup', callback);
+  runSequence(
+      'clean:dist', 'compile:ts', 'call:namespace', 'gen:assets',
+      'bundle:rollup', 'cache:bust', 'bundle:zip', callback);
 });
 
 gulp.task('aot', function(callback) {
-  runSequence('clean:dist', 'compile:aot', 'gen:assets', 'set:aot', 'bundle:rollup', callback);
+  runSequence(
+      'clean:dist', 'compile:aot', 'call:namespace:aot', 'gen:assets',
+      'set:aot', 'bundle:rollup', 'cache:bust', 'bundle:zip', callback);
 });
 
 gulp.task('clean:dist', function() {
     return gulp.src('dist', { read: false }).pipe(clean());
 });
+
+gulp.task('call:namespace', allowNamespaceCall.bind(null, false));
+gulp.task('call:namespace:aot', allowNamespaceCall.bind(null, true));
+
+function allowNamespaceCall(aot){
+    var src = aot?'src/**/*.js':'dist/src/**/*.js';
+    var dest = aot?'src':'dist/src';
+
+    return gulp.src(src)
+        .pipe(replace('import * as moment', 'import moment'))
+        .pipe(gulp.dest(dest));
+}
 
 // Compile TypeScript to JS
 gulp.task('compile:ts', function() {
@@ -49,21 +72,6 @@ gulp.task('compile:aot', function() {
     return ngc('tsconfig.prod-aot.json')
         .pipe(gulp.dest('dist/src/app'));
 });
-
-function minifyTemplate(path, ext, file, callback) {
-    try {
-        var minifiedFile = htmlMinifier.minify(file, {
-            collapseWhitespace: true,
-            caseSensitive: true,
-            removeComments: true,
-            removeRedundantAttributes: true
-        });
-        callback(null, minifiedFile);
-    }
-    catch (err) {
-        callback(err);
-    }
-}
 
 gulp.task('gen:assets', function() {
     return merge([
@@ -98,7 +106,59 @@ gulp.task('set:aot', function() {
 });
 
 gulp.task('bundle:rollup', function() {
-  return rollup('rollup.config.js')
-    .pipe(source('app.js'))
-    .pipe(gulp.dest('./dist/public'));
+    var deferred = Q.defer();
+    var config = require( './rollup.config.es5.js' );
+    rollup.rollup(config).then( function ( bundle ) {
+
+        bundle.write({
+            dest: 'dist/public/app.js',
+            sourceMap: false,
+            format: 'iife',
+            globals: {
+                'process': 'process'
+            }
+        });
+
+        deferred.resolve();
+    });
+
+    return deferred.promise;
 });
+
+gulp.task('bundle:hash', function(){
+  return gulp.src(['dist/public/polyfills.js', 'dist/public/app.js'])
+    .pipe(rev())
+    .pipe(revdel())
+    .pipe(gulp.dest('dist/public'))
+    .pipe(rev.manifest())
+    .pipe(gulp.dest('dist/public'))
+})
+
+gulp.task('cache:bust', ['bundle:hash'], function(){
+  var manifest = gulp.src('dist/public/rev-manifest.json');
+ 
+  return gulp.src('dist/public/index.html')
+    .pipe(revReplace({manifest: manifest}))
+    .pipe(gulp.dest('dist/public'));
+});
+
+gulp.task('bundle:zip', function() {
+    return gulp.src(['dist/public/polyfills*.js', 'dist/public/app*.js'])
+        .pipe(gzip({ gzipOptions: { level: 9 } }))
+        .pipe(gulp.dest('dist/public'));
+});
+
+function minifyTemplate(path, ext, file, callback) {
+    try {
+        var minifiedFile = htmlMinifier.minify(file, {
+            collapseWhitespace: true,
+            caseSensitive: true,
+            removeComments: true,
+            removeRedundantAttributes: true
+        });
+        callback(null, minifiedFile);
+    }
+    catch (err) {
+        callback(err);
+    }
+}

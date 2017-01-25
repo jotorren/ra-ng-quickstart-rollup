@@ -1,9 +1,9 @@
-import includePaths from 'rollup-plugin-includepaths';
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import progress from 'rollup-plugin-progress';
-import uglify from 'rollup-plugin-uglify';
+var babel = require('rollup-plugin-babel');
+var commonjs = require('rollup-plugin-commonjs');
+var includePaths = require('rollup-plugin-includepaths');
+var nodeResolve = require('rollup-plugin-node-resolve');
+var progress = require('rollup-plugin-progress');
+var uglify = require('rollup-plugin-uglify');
 
 const EVENT = process.env.npm_lifecycle_event || '';
 const MAP = EVENT.includes('map');
@@ -14,11 +14,8 @@ console.log('process.env.ENV: [' + ENV + ']');
 console.log('sourceMap: [' + MAP + ']');
 console.log('AoT: [' + AOT + ']');
 
-export default {
+module.exports = {
     entry: AOT ? 'src/app/main-aot.js' : 'dist/src/app/main.js',
-    dest: 'dist/public/app.js',
-    sourceMap: MAP,
-    format: 'iife',
     plugins: [
         progress({
             clearLine: true
@@ -61,8 +58,5 @@ export default {
             console.error(warn.loc);
         }
     },
-    external: ['process'],
-    globals: {
-        'process': 'process'
-    }
+    external: ['process']
 }
